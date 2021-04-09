@@ -1,0 +1,28 @@
+{
+    "en": "English", 
+    "de": "Deutsch", 
+    "fr": "Français", 
+    "pt": "Português",
+    "en-s": "EN", 
+    "pt-s": "PT", 
+    "fr-s": "FR",
+    "de-s": "DE",
+    "copyright": "© Centre Québecois d'Excellence Numérique, Québec 2020. Tous les droits réservés.", 
+    "welcomeMessage": "Ce site permet, par moyen des expérimentations, explorer les concepts techniques permettant de soutenir la relation mandataire-mandant d’une attestation, et évaluer des modèles permettant de soutenir cette relation pour l’attestation d’identité gouvernementale.",
+    "btnLogin": "Connexion", 
+    "btnLogout": "Sortir", 
+    "login": "Entrer", 
+    "username": "Nom d'usager", 
+    "password": "Mot de passe", 
+    "btnSend": "Envoyer", 
+    "formLoginMsg": "Si vous avez besoin d'information pour l'utilisation, référez-vous à la page README.md", 
+    "modalLoginMsg": "Login info", 
+    "modalCorrectInfoMsg": "Merci de saisir les informations correctes.", 
+    "ok": "OK",
+    "noauthMsg1": "Vous n'êtes pas connecté", 
+    "noauthMsg2": "Merci de vous connecter au système", 
+    "gender":{
+        "male": "Masculin", 
+        "female": "Féminin"
+    }
+}

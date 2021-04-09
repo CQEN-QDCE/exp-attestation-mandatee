@@ -1,0 +1,679 @@
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: cpq-demo-exp-att-del
+  annotations:
+    description: Site Web qui émet et consomme l'attestation pour les expérimentations d'une attestation mandatée.
+    tags: cqen, experimentation, sqin, aries, cpq, curateur public du québec, émetteur, attestation, mandatée, mandat
+objects:
+#CPQ-kms (PostgreSQL)
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: cpq-build
+  stringData:
+    WebHookSecretKey: "${GITHUB_WEBHOOK_SECRET}"
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: cpq-kms
+    annotations:
+      template.openshift.io/expose-username: "{.data['database-user']}"
+      template.openshift.io/expose-password: "{.data['database-password']}"
+      template.openshift.io/expose-username: "{.data['database-admin-user']}"
+      template.openshift.io/expose-password: "{.data['database-admin-password']}"
+      template.openshift.io/expose-password: "{.data['database-name']}"
+      template.openshift.io/expose-password: "{.data['agent-did-seed']}"
+      template.openshift.io/expose-password: "{.data['agent-did']}"
+      template.openshift.io/expose-password: "{.data['master-key']}"
+      template.openshift.io/expose-password: "{.data['admin-api-key']}"
+  stringData:
+    database-user: "dbuser"
+    database-password: "${POSTGRESQL_PASSWORD}"
+    database-admin-user: "postgres"
+    database-admin-password: "${POSTGRESQL_ADMIN_PASSWORD}"
+    database-name: "${POSTGRESQL_DATABASE_NAME}"
+    agent-did-seed: "${AGENT_DID_SEED}"
+    agent-did: "${AGENT_DID}"
+    master-key: "${MASTER_KEY}"
+    admin-api-key: ${ADMIN_API_KEY}
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: cpq-kms
+  spec:
+    ports:
+    - name: cpq-kms
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 0
+    selector:
+      name: cpq-kms
+    type: ClusterIP
+    sessionAffinity: None
+  status:
+    loadBalancer: {}
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: cpq-kms
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: cpq-kms
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: 'true'
+    labels:
+      app: cpq-kms
+      app.kubernetes.io/part-of: CPQ
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - cpq-kms
+        from:
+          kind: ImageStreamTag
+          name: postgresql:10
+          namespace: openshift
+        lastTriggeredImage: ''
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: cpq-kms
+    template:
+      metadata:
+        labels:
+          name: cpq-kms
+      spec:
+        containers:
+        - name: cpq-kms
+          image: " "
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          readinessProbe:
+            timeoutSeconds: 1
+            initialDelaySeconds: 5
+            exec:
+              command:
+              - "/usr/libexec/check-container"
+          livenessProbe:
+            timeoutSeconds: 10
+            initialDelaySeconds: 120
+            exec:
+              command:
+              - "/usr/libexec/check-container"
+              - "--live"
+          env:
+          - name: POSTGRESQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: cpq-kms
+                key: database-user
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cpq-kms
+                key: database-password
+          - name: POSTGRESQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: cpq-kms
+                key: database-name
+          - name: POSTGRESQL_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cpq-kms
+                key: database-admin-password                
+          resources:
+            limits:
+              memory: 512Mi
+          volumeMounts:
+          - name: cpq-kms-data
+            mountPath: "/var/lib/pgsql/data"
+          terminationMessagePath: "/dev/termination-log"
+          imagePullPolicy: IfNotPresent
+          capabilities: {}
+          securityContext:
+            capabilities: {}
+            privileged: false
+        volumes:
+        - name: cpq-kms-data
+          persistentVolumeClaim:
+            claimName: cpq-kms
+        restartPolicy: Always
+        dnsPolicy: ClusterFirst
+  status: {}
+
+#CPQ-agent
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: cpq-agent
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    labels:
+      app: cpq-agent
+    name: cpq-agent
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: 'cpq-agent:latest'
+    resources: {}
+    successfulBuildsHistoryLimit: 5
+    failedBuildsHistoryLimit: 5
+    strategy:
+      type: Docker
+      dockerStrategy:
+        dockerfilePath: Dockerfile
+    postCommit: {}
+    source:
+      contextDir: CPQ-agent
+      type: Git
+      git:
+        ref: 'deploy-parameters'
+        uri: 'https://github.com/CQEN-QDCE/Demo2.git'
+    triggers:
+      - type: ConfigChange
+    runPolicy: Serial
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: cpq-agent
+    labels:
+      app: cpq-agent
+      app.kubernetes.io/part-of: CPQ
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+      activeDeadlineSeconds: 21600
+    triggers:
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - cpq-agent
+          from:
+            kind: ImageStreamTag
+            name: 'cpq-agent:latest'
+    replicas: 1
+    revisionHistoryLimit: 10
+    test: false
+    selector:
+      app: cpq-agent
+    template:
+      metadata:
+        labels:
+          app: cpq-agent
+      spec:
+        containers:
+          - name: cpq-agent
+            command:
+              - bash
+              - -c
+              - $(echo aca-py start
+                --inbound-transport http '0.0.0.0' ${HTTP_INTERFACE_PORT}
+                $([ ! -z "${AGENT_ENDPOINT}" ] && echo "--endpoint ${AGENT_ENDPOINT}" || echo "")
+                --outbound-transport http
+                --admin 0.0.0.0 ${ADMIN_INTERFACE_PORT}
+                --genesis-url "${GENESIS_FILE_URL}"
+                --auto-accept-invites
+                --auto-accept-requests
+                --auto-respond-messages
+                --auto-respond-credential-proposal
+                --auto-respond-credential-offer
+                --auto-respond-credential-request
+                --auto-respond-presentation-proposal
+                --auto-respond-presentation-request
+                --auto-store-credential
+                --wallet-type 'indy'
+                --wallet-name "$(echo ${KMS_NAME} | tr '[:upper:]' '[:lower:]' | sed "s~-~_~g")"
+                --wallet-key "${MASTER_KEY}"
+                --wallet-storage-type "${KMS_STORAGE_TYPE}"
+                --wallet-storage-config "$(eval echo \"${KMS_STORAGE_CONFIGURATION}\")"
+                --wallet-storage-creds "$(eval echo \"${KMS_STORAGE_CREDENTIALS}\")"
+                $([ ! -z "${AGENT_DID_SEED}" ] && echo "--seed ${AGENT_DID_SEED}" || echo "")
+                $([ ! -z "${AGENT_ADMIN_API_KEY}" ] && echo "--admin-api-key ${AGENT_ADMIN_API_KEY}" || echo "--admin-insecure-mode")
+                --label '${AGENT_NAME}'
+                --log-level ${AGENT_LOG_LEVEL});
+            env:
+              - name: GENESIS_FILE_URL
+                value: ${GENESIS_FILE_URL}
+              - name: KMS_NAME
+                value: cpq-agent
+              - name: KMS_STORAGE_TYPE
+                value: ${KMS_STORAGE_TYPE}
+              - name: KMS_STORAGE_CONFIGURATION
+                value: ${KMS_STORAGE_CONFIG}
+              - name: KMS_STORAGE_CREDENTIALS
+                value: ${KMS_STORAGE_CREDS}
+              - name: POSTGRESQL_KMS_HOST
+                value: ${POSTGRESQL_KMS_HOST}
+              - name: POSTGRESQL_KMS_PORT
+                value: ${POSTGRESQL_KMS_PORT}
+              - name: POSTGRESQL_KMS_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: cpq-kms
+                    key: database-user
+              - name: POSTGRESQL_KMS_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: cpq-kms
+                    key: database-password
+              - name: POSTGRESQL_KMS_ADMIN_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: cpq-kms
+                    key: database-admin-user
+              - name: POSTGRESQL_KMS_ADMIN_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: cpq-kms
+                    key: database-admin-password
+              - name: MASTER_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: cpq-kms
+                    key: master-key
+              - name: AGENT_DID_SEED
+                valueFrom:
+                  secretKeyRef:
+                    name: cpq-kms
+                    key: agent-did-seed
+              - name: AGENT_DID
+                valueFrom:
+                  secretKeyRef:
+                    name: cpq-kms
+                    key: agent-did
+              - name: HTTP_INTERFACE_PORT
+                value: ${AGENT_HTTP_PORT}
+              - name: ADMIN_INTERFACE_PORT
+                value: ${AGENT_ADMIN_PORT}
+              - name: AGENT_ADMIN_API_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: cpq-kms
+                    key: admin-api-key
+              - name: AGENT_NAME
+                value: ${AGENT_NAME}
+              - name: AGENT_ENDPOINT
+                value: ${AGENT_ENDPOINT}
+              - name: AGENT_LOG_LEVEL
+                value: ${LOG_LEVEL}
+            image: " "
+            ports:
+              - containerPort: 3000
+                protocol: TCP
+              - containerPort: 8000
+                protocol: TCP
+            readinessProbe:
+              timeoutSeconds: 30
+              initialDelaySeconds: 3
+              exec:
+                command:
+                  - bash
+                  - "-c"
+                  - 'curl --fail "http://localhost:${ADMIN_INTERFACE_PORT}/status/ready" -H "X-API-KEY: ${AGENT_ADMIN_API_KEY}"'
+            livenessProbe:
+              timeoutSeconds: 30
+              initialDelaySeconds: 300
+              exec:
+                command:
+                  - bash
+                  - "-c"
+                  - 'curl --fail "http://localhost:${ADMIN_INTERFACE_PORT}/status/live" -H "X-API-KEY: ${AGENT_ADMIN_API_KEY}"'
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            imagePullPolicy: Always
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+        schedulerName: default-scheduler
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: cpq-agent
+  spec:
+    selector:
+      app: cpq-agent
+    ports:
+      - name: '3000'
+        protocol: TCP
+        port: 3000
+        targetPort: 3000
+      - name: '8000'
+        protocol: TCP
+        port: 8000
+        targetPort: 8000
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: cpq-agent
+  spec:
+    host: cpq-agent.apps.exp.lab.pocquebec.org
+    to:
+      kind: Service
+      name: cpq-agent
+      weight: 100
+    port:
+      targetPort: 8000
+    wildcardPolicy: None
+  status:
+    ingress:
+      - host: cpq-agent.apps.exp.lab.pocquebec.org
+        routerName: default
+        conditions:
+          - type: Admitted
+            status: 'True'
+        wildcardPolicy: None
+        routerCanonicalHostname: apps.exp.lab.pocquebec.org
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: cpq-agent-admin
+  spec:
+    host: cpq-agent-admin.apps.exp.lab.pocquebec.org
+    to:
+      kind: Service
+      name: cpq-agent
+      weight: 100
+    port:
+      targetPort: 3000
+    wildcardPolicy: None
+  status:
+    ingress:
+      - host: cpq-agent-admin.apps.exp.lab.pocquebec.org
+        routerName: default
+        conditions:
+          - type: Admitted
+            status: 'True'
+        wildcardPolicy: None
+        routerCanonicalHostname: apps.exp.lab.pocquebec.org
+
+#CPQ-controller
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: cpq-controller
+  data:
+    config.js: |
+      window.env = {
+        CURATELLE_SCHEMA_NAME: "${CURATELLE_SCHEMA_NAME}",
+        CURATELLE_SCHEMA_VERSION: "${CURATELLE_SCHEMA_VERSION}",
+        AGENT_DID: "${AGENT_DID}",
+        CURATELLE_CREDENTIAL_DEFINITION: "${CURATELLE_CREDENTIAL_DEFINITION}"
+      }
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: cpq-controller
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    annotations:
+      app.openshift.io/vcs-uri: https://github.com/CQEN-QDCE/Demo2.git
+      template.alpha.openshift.io/wait-for-ready: "true"
+    labels:
+      app: cpq-controller
+    name: cpq-controller
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: cpq-controller:latest
+    source:
+      contextDir: CPQ-controller
+      git:
+        ref: 'deploy-parameters'
+        uri: https://github.com/CQEN-QDCE/Demo2.git
+      type: Git
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile
+      type: Docker
+    triggers:
+      - type: ConfigChange
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: cpq-controller
+    labels:
+      app: cpq-controller
+      app.kubernetes.io/part-of: CPQ
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+      activeDeadlineSeconds: 21600
+    triggers:
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - cpq-controller
+          from:
+            kind: ImageStreamTag
+            name: "cpq-controller:latest"
+    replicas: 1
+    revisionHistoryLimit: 10
+    test: false
+    selector:
+      app: cpq-controller
+    template:
+      metadata:
+        labels:
+          app: cpq-controller
+      spec:
+        containers:
+          - name: cpq-controller
+            env:
+              - name: REACT_APP_ISSUER_HOST_URL
+                value: ${AGENT_ADMIN_ENDPOINT}
+            image: " "
+            volumeMounts:
+              - name: config-volume
+                mountPath: /opt/app-root/src/build/config
+            ports:
+              - containerPort: 15000
+                protocol: TCP
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            imagePullPolicy: Always
+        volumes:
+          - name: config-volume
+            configMap:
+              name: cpq-controller
+              items:
+              - key: "config.js"
+                path: "config.js"
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+        schedulerName: default-scheduler
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: cpq-controller
+  spec:
+    selector:
+      app: cpq-controller
+    ports:
+      - name: "15000"
+        protocol: TCP
+        port: 15000
+        targetPort: 15000
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: cpq-controller2
+  spec:
+    host: cpq-controller2.apps.exp.lab.pocquebec.org
+    to:
+      kind: Service
+      name: cpq-controller
+      weight: 100
+    port:
+      targetPort: 15000
+    wildcardPolicy: None
+  status:
+    ingress:
+      - host: cpq-controller2.apps.exp.lab.pocquebec.org
+        routerName: default
+        conditions:
+          - type: Admitted
+            status: "True"
+        wildcardPolicy: None
+        routerCanonicalHostname: apps.exp.lab.pocquebec.org
+parameters:
+- name: GITHUB_WEBHOOK_SECRET
+  description: A secret string used to configure the GitHub webhook for the marketplace app build
+  generate: expression 
+  from: "[a-zA-Z0-9]{40}"
+  required: true
+- name: POSTGRESQL_PASSWORD
+  displayName: PostgreSQL connection password
+  description: Password for the PostgreSQL connection user. Needs to be basee64 encoded.
+  required: true
+  generate: "expression"
+  from: "[a-zA-Z0-9]{16}"
+- name: POSTGRESQL_ADMIN_PASSWORD
+  displayName: PostgreSQL administrator password
+  description: Password for the PostgreSQL administrative account. Needs to be basee64 encoded.
+  required: true
+  generate: "expression"
+  from: "[a-zA-Z0-9]{16}"
+- name: POSTGRESQL_DATABASE_NAME
+  displayName: PostgreSQL database name
+  description: Name of the PostgreSQL database.
+  required: true
+  value: "kms"
+- name: GENESIS_FILE_URL
+  displayName: Genesis file URL
+  description: The URL from which the genesis file can be downloaded.
+  required: true
+  value: http://vonx.pocquebec.org:9000/genesis
+- name: LOG_LEVEL
+  displayName: Log Level
+  description: The logging level of the agent.
+  required: true
+  value: DEBUG
+- name: POSTGRESQL_KMS_HOST
+  displayName: PostgreSql key management service hostname
+  required: true
+  description: Hostname of the deployed PostgreSql key management service.  Only used when KMS_STORAGE_TYPE = postgres_storage.
+  value: cpq-kms
+- name: POSTGRESQL_KMS_PORT
+  displayName: PostgreSql key management service port
+  required: true
+  description: The port number of the deployed PostgreSql key management service.  Only used when KMS_STORAGE_TYPE = postgres_storage.
+  value: "5432"
+- name: KMS_STORAGE_TYPE
+  displayName: Key management service storage type
+  description: The key management service storage type.  Your choice of 'postgres_storage' or 'sqlite_storage' at the moment.  If not defined, defaults to 'sqlite_storage' for compatibility.
+  required: false
+  value: postgres_storage
+- name: AGENT_ADMIN_PORT
+  displayName: Agent Admin Port
+  description: The admin port on which the service will listen.
+  required: true
+  value: "3000"
+- name: MASTER_KEY
+  displayName: Master key
+  description: The encryption key to be used for the the key management service.
+  required: true
+  generate: "expression"
+  from: "[a-zA-Z0-9]{16}"
+- name: AGENT_DID_SEED
+  displayName: Agent DID seed.
+  description: Seed used to create the agent DID.
+  required: true
+  value: "0000000000000000CurateurPublicQc"
+- name: AGENT_DID
+  displayName: Agent DID
+  description: The public DID associated to the agent.
+  required: false
+  value: "23YD3dyHuyFvLpLC3zF58F"
+- name: ADMIN_API_KEY
+  displayName: Agent admin API key
+  description: The key used to authenticate client requests to the admin api.
+  required: false
+  value: ""
+- name: KMS_STORAGE_CONFIG
+  displayName: Key management service storage configuration
+  required: true
+  description: The key management service storage configuration.
+  value: '{\"url\":\"${POSTGRESQL_KMS_HOST}:${POSTGRESQL_KMS_PORT}\",\"max_connections\":5}'
+- name: KMS_STORAGE_CREDS
+  displayName: Key management service storage credentials
+  required: true
+  description: The key management service credentials.
+  value: '{\"account\":\"${POSTGRESQL_KMS_USER}\",\"password\":\"${POSTGRESQL_KMS_PASSWORD}\",\"admin_account\":\"${POSTGRESQL_KMS_ADMIN_USER}\",\"admin_password\":\"${POSTGRESQL_KMS_ADMIN_PASSWORD}\"}'
+- name: AGENT_NAME
+  displayName: Agent name
+  description: The name of the agent.
+  required: true
+  value: "Curateur-Public-Québec"
+- name: AGENT_HTTP_PORT
+  displayName: Agent http port
+  description: The http port on which the service will listen.
+  required: true
+  value: "8000"
+- name: CURATELLE_SCHEMA_NAME
+  displayName: Curatelle schema name
+  description: The name of the curatelle schema.
+  required: true
+  value: "Identité Gouvernementale"
+- name: CURATELLE_SCHEMA_VERSION
+  displayName: Curatelle schema version
+  description: The version of the curatelle schema.
+  required: true
+  value: "0.5"
+- name: CURATELLE_CREDENTIAL_DEFINITION
+  displayName: Credential definition curatelle
+  description: The credential definition of the curatelle.
+  required: true
+  value: "DPm1o7E4GUZBEHsEXhnqhD:3:CL:1740:Registre_Identite_Qc"
+- name: AGENT_ENDPOINT
+  displayName: Agent endpoint
+  description: The endpoint of the agent.
+  required: true
+  value: "http://cpq-agent.apps.exp.lab.pocquebec.org"
+- name: AGENT_ADMIN_ENDPOINT
+  displayName: Agent endpoint
+  description: The admin endpoint of the agent.
+  required: true
+  value: "http://cpq-agent-admin.apps.exp.lab.pocquebec.org"

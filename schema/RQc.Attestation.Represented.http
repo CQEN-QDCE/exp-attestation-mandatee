@@ -1,0 +1,94 @@
+#/*
+#* Copyright (c) 2020 Gouvernement du Québec
+#* Auteur: Julio Cesar Torres (torj01)
+#* SPDX-License-Identifier: LiLiQ-R-v.1.1
+#* License-Filename: /LICENSE
+#*/
+##############################################################
+# Requetes http pour l'émeteur d'attestations d'identité 
+##############################################################
+### Définition des variables globales
+@hostname = http://rqc-agent-admin.apps.exp.lab.pocquebec.org
+
+####
+#### Get list de connections 
+#### 
+GET {{hostname}}/connections HTTP/1.1
+X-API-Key: secret
+Content-Type: application/json
+
+
+####
+#### Recupère les schemas crées par ce participant
+####
+GET {{hostname}}/schemas/created HTTP/1.1
+X-API-Key: secret
+Content-Type: : application/json"
+
+
+####
+#### Creer un schema d'identité REGISTRE D'IDENTITE QUEBEC
+####
+POST {{hostname}}/schemas HTTP/1.1
+X-API-Key: secret
+Content-Type: application/json
+
+{
+    "schema_name": "Identité Gouvernementale",
+    "schema_version": "0.4",
+    "attributes": [
+        "@context", 
+        "id", 
+        "type",
+        "credentialSchema",
+        "issuanceDate",
+        "expirationDate", 
+        "issuer",
+        "trustFramework",
+        "credentialSubject.id",
+        "credentialSubject.firstNames",
+        "credentialSubject.lastName",
+        "credentialSubject.birthDate",
+        "credentialSubject.birthplace",
+        "credentialSubject.gender",
+        "credentialSubject.fatherFullName",
+        "credentialSubject.motherFullName", 
+        "credentialSubject.photo"
+    ]
+}
+
+#### 1678
+              
+@schema_id = "G15uJpKsf9JnvYCN54Sd28:2:Identité Gouvernementale:0.4"
+@cred_def_id = "23YD3dyHuyFvLpLC3zF58F:3:CL:1678:Registre_Identite_Qc"
+# G15uJpKsf9JnvYCN54Sd28:3:CL:1635:Registre_Identite_Qc
+
+####
+#### Crée la définition d'une attestation (CRED_DEF) du registre d'identité Québec
+####
+POST {{hostname}}/credential-definitions HTTP/1.1
+Content-Type: application/json
+X-API-Key: secret
+
+{
+  "support_revocation": false,
+  "tag": "Registre_Identite_Qc",
+  "schema_id": {{schema_id}}
+}
+
+
+####
+#### Recupère un schema selon son {schema_id}
+####
+GET {{hostname}}/schemas/{{schema_id}} HTTP/1.1
+X-API-Key: secret
+Content-Type: : application/json"
+
+
+####
+#### Recupère une attestation selon son {cred_def}
+####
+
+GET {{hostname}}/credential/{{cred_def_id}} HTTP/1.1
+X-API-Key: secret
+Content-Type: : application/json"

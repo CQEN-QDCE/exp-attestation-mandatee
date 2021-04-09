@@ -1,0 +1,222 @@
+#/*
+#* Copyright (c) 2020 Gouvernement du Québec
+#* Auteur: Julio Cesar Torres (torj01)
+#* SPDX-License-Identifier: LiLiQ-R-v.1.1
+#* License-Filename: /LICENSE
+#*/
+##############################################################
+# Requetes http pour l'émeteur d'attestations d'identité 
+##############################################################
+### Définition des variables globales
+
+# @hostname = http://rqc-agent-admin.apps.exp.lab.pocquebec.org
+@hostname = http://cpq-agent-admin.apps.exp.lab.pocquebec.org
+
+
+####
+#### Get list de connections 
+#### 
+GET {{hostname}}/connections HTTP/1.1
+X-API-Key: secret
+Content-Type: application/json
+
+
+####
+#### Recupère les schemas crées par ce participant
+####
+GET {{hostname}}/schemas/created HTTP/1.1
+X-API-Key: secret
+Content-Type: : application/json"
+
+
+####
+#### Creer un schema d'identité REGISTRE D'IDENTITE QUEBEC
+####
+POST {{hostname}}/schemas HTTP/1.1
+X-API-Key: secret
+Content-Type: application/json
+
+{
+    "schema_name": "Identité Gouvernementale",
+    "schema_version": "0.5",
+    "attributes": [
+        "@context", 
+        "id", 
+        "type",
+        "credentialSchema",
+        "issuanceDate",
+        "expirationDate", 
+        "issuer",
+        "trustFramework",
+        "credentialSubject.id",
+        "credentialSubject.firstNames",
+        "credentialSubject.lastName",
+        "credentialSubject.birthDate",
+        "credentialSubject.birthplace",
+        "credentialSubject.gender",
+        "credentialSubject.fatherFullName",
+        "credentialSubject.motherFullName", 
+        "credentialSubject.photo"
+    ]
+}
+
+#### 
+              
+@schema_id = "DPm1o7E4GUZBEHsEXhnqhD:2:Identité Gouvernementale:0.5"
+@cred_def_id = "23YD3dyHuyFvLpLC3zF58F:3:CL:1635:Registre_Identite_Qc"
+
+
+####
+#### Crée la définition d'une attestation (CRED_DEF) du registre d'identité Québec
+####
+POST {{hostname}}/credential-definitions HTTP/1.1
+Content-Type: application/json
+X-API-Key: secret
+
+{
+  "support_revocation": false,
+  "tag": "Registre_Identite_Qc",
+  "schema_id": {{schema_id}}
+}
+
+
+####
+#### Recupère un schema selon son {schema_id}
+####
+GET {{hostname}}/schemas/{{schema_id}} HTTP/1.1
+X-API-Key: secret
+Content-Type: : application/json"
+
+
+####
+#### Recupère une attestation selon son {cred_def}
+####
+
+GET {{hostname}}/credential/{{cred_def_id}} HTTP/1.1
+X-API-Key: secret
+Content-Type: : application/json"
+
+
+####
+#### Creer un schema d'attestation de mandat 
+#### https://github.com/hyperledger/aries-rfcs/tree/master/concepts/0103-indirect-identity-control
+#### https://github.com/dhh1128/aries-rfcs/blob/master/concepts/0103-indirect-identity-control/guardianship-sample/schema.json
+POST {{hostname}}/schemas HTTP/1.1
+X-API-Key: secret
+Content-Type: application/json
+
+{
+  "schema_name": "Mandat de Curatelle",
+  "schema_version": "0.3",
+  "attributes": [
+        "@context", 
+        "id", 
+        "type", 
+        "credentialSchema",
+        "issuanceDate", 
+        "expirationDate",
+        "issuer", 
+        "trustFramework", 
+        "auditURI",
+        "appealURI",
+        "credentialSubject.holder.type",
+        "credentialSubject.holder.role",
+        "credentialSubject.holder.rationaleURI",
+        "credentialSubject.holder.firstNames",
+        "credentialSubject.holder.lastName",
+        "credentialSubject.holder.birthDate",
+        "credentialSubject.holder.birthplace",
+        "credentialSubject.holder.gender",
+        "credentialSubject.holder.fatherFullName",
+        "credentialSubject.holder.motherFullName",
+        "credentialSubject.holder.constraints.boundaries",
+        "credentialSubject.holder.constraints.pointOfOrigin",
+        "credentialSubject.holder.constraints.radiusKm",
+        "credentialSubject.holder.constraints.jurisdictions",
+        "credentialSubject.holder.constraints.trigger",
+        "credentialSubject.holder.constraints.circumstances",
+        "credentialSubject.proxied.type",
+        "credentialSubject.proxied.permissions",
+        "credentialSubject.proxied.firstNames",
+        "credentialSubject.proxied.lastName",
+        "credentialSubject.proxied.birthDate",
+        "credentialSubject.proxied.birthplace",
+        "credentialSubject.proxied.gender",
+        "credentialSubject.proxied.fatherFullName",
+        "credentialSubject.proxied.motherFullName",
+        "credentialSubject.proxied.nativeLanguage",
+        "credentialSubject.proxied.identifyingMarks",
+        "credentialSubject.proxied.photo",
+        "credentialSubject.proxied.iris",
+        "credentialSubject.proxied.fingerprint"
+    ]
+}
+###  V4SGRU86Z58d6TV7PBUe6f:2:MANDAT_CURATELLE:0.1
+####
+#### Crée la définition d'une attestation (CRED_DEF) du mandat de curatelle. 
+#### Noter qu'il donne support à la revocation de l'attestation.
+####
+# 
+@schema_mandat_curatelle = "2dRxhexBiWbj2BmbcHziBQ:2:Mandat de Curatelle:0.3"
+POST {{hostname}}/credential-definitions HTTP/1.1
+Content-Type: application/json
+X-API-Key: secret
+
+{
+  "support_revocation": false,
+  "tag": "Curateur_Publique_Quebec",
+  "schema_id": {{schema_mandat_curatelle}}
+}
+
+### "credential_definition_id": "2dRxhexBiWbj2BmbcHziBQ:3:CL:1639:Curateur_Publique_Quebec"
+
+####################################################################################################
+
+####
+#### Creer un schema d'attestation de mandat 
+#### https://github.com/hyperledger/aries-rfcs/tree/master/concepts/0103-indirect-identity-control
+#### https://github.com/dhh1128/aries-rfcs/blob/master/concepts/0103-indirect-identity-control/guardianship-sample/schema.json
+POST {{hostname}}/schemas HTTP/1.1
+X-API-Key: secret
+Content-Type: application/json
+
+{
+  "schema_name": "DEBUG",
+  "schema_version": "0.2",
+  "attributes": [
+        
+        "credentialSubject.holder.firstNames",
+        "credentialSubject.holder.lastName",
+        "credentialSubject.holder.birthDate",
+        "credentialSubject.holder.birthplace",
+        "credentialSubject.holder.gender",
+        "credentialSubject.holder.fatherFullName",
+        "credentialSubject.holder.motherFullName",
+        "credentialSubject.proxied.firstNames",
+        "credentialSubject.proxied.lastName",
+        "credentialSubject.proxied.birthDate",
+        "credentialSubject.proxied.birthplace",
+        "credentialSubject.proxied.gender",
+        "credentialSubject.proxied.fatherFullName",
+        "credentialSubject.proxied.motherFullName"
+        
+    ]
+}
+###  V4SGRU86Z58d6TV7PBUe6f:2:MANDAT_CURATELLE:0.1
+####
+#### Crée la définition d'une attestation (CRED_DEF) du mandat de curatelle. 
+#### Noter qu'il donne support à la revocation de l'attestation.
+####
+# 
+@schema_mandat_curatelledgb = "V4SGRU86Z58d6TV7PBUe6f:2:DEBUG:0.2"
+POST {{hostname}}/credential-definitions HTTP/1.1
+Content-Type: application/json
+X-API-Key: secret
+
+{
+  "support_revocation": false,
+  "tag": "CurateurPublique-Mandat",
+  "schema_id": {{schema_mandat_curatelle}}
+}
+
+### "credential_definition_id": "V4SGRU86Z58d6TV7PBUe6f:3:CL:1581:CurateurPublique-Mandat"

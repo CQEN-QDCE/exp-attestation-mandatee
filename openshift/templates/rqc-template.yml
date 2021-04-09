@@ -1,0 +1,684 @@
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: rqc-demo-exp-att-del
+  annotations:
+    description: Site Web qui émet et consomme l'attestation pour les expérimentations d'une attestation mandatée.
+    tags: cqen, experimentation, sqin, aries, rqc, Registre Québec, émetteur, consommateur, attestation, mandatée
+objects:
+#RQC-kms (PostgreSQL)
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: rqc-build
+  stringData:
+    WebHookSecretKey: "${GITHUB_WEBHOOK_SECRET}"
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: rqc-kms
+    annotations:
+      template.openshift.io/expose-username: "{.data['database-user']}"
+      template.openshift.io/expose-password: "{.data['database-password']}"
+      template.openshift.io/expose-username: "{.data['database-admin-user']}"
+      template.openshift.io/expose-password: "{.data['database-admin-password']}"
+      template.openshift.io/expose-password: "{.data['database-name']}"
+      template.openshift.io/expose-password: "{.data['agent-did-seed']}"
+      template.openshift.io/expose-password: "{.data['agent-did']}"
+      template.openshift.io/expose-password: "{.data['master-key']}"
+      template.openshift.io/expose-password: "{.data['admin-api-key']}"
+  stringData:
+    database-user: "dbuser"
+    database-password: "${POSTGRESQL_PASSWORD}"
+    database-admin-user: "postgres"
+    database-admin-password: "${POSTGRESQL_ADMIN_PASSWORD}"
+    database-name: "${POSTGRESQL_DATABASE_NAME}"
+    agent-did-seed: "${AGENT_DID_SEED}"
+    agent-did: "${AGENT_DID}"
+    master-key: "${MASTER_KEY}"
+    admin-api-key: ${ADMIN_API_KEY}
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: rqc-kms
+  spec:
+    ports:
+    - name: rqc-kms
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 0
+    selector:
+      name: rqc-kms
+    type: ClusterIP
+    sessionAffinity: None
+  status:
+    loadBalancer: {}
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: rqc-kms
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: rqc-kms
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: 'true'
+    labels:
+      app: rqc-kms
+      app.kubernetes.io/part-of: RQc
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - rqc-kms
+        from:
+          kind: ImageStreamTag
+          name: postgresql:10
+          namespace: openshift
+        lastTriggeredImage: ''
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: rqc-kms
+    template:
+      metadata:
+        labels:
+          name: rqc-kms
+      spec:
+        containers:
+        - name: rqc-kms
+          image: " "
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          readinessProbe:
+            timeoutSeconds: 1
+            initialDelaySeconds: 5
+            exec:
+              command:
+              - "/usr/libexec/check-container"
+          livenessProbe:
+            timeoutSeconds: 10
+            initialDelaySeconds: 120
+            exec:
+              command:
+              - "/usr/libexec/check-container"
+              - "--live"
+          env:
+          - name: POSTGRESQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: rqc-kms
+                key: database-user
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rqc-kms
+                key: database-password
+          - name: POSTGRESQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: rqc-kms
+                key: database-name
+          - name: POSTGRESQL_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rqc-kms
+                key: database-admin-password                
+          resources:
+            limits:
+              memory: 512Mi
+          volumeMounts:
+          - name: rqc-kms-data
+            mountPath: "/var/lib/pgsql/data"
+          terminationMessagePath: "/dev/termination-log"
+          imagePullPolicy: IfNotPresent
+          capabilities: {}
+          securityContext:
+            capabilities: {}
+            privileged: false
+        volumes:
+        - name: rqc-kms-data
+          persistentVolumeClaim:
+            claimName: rqc-kms
+        restartPolicy: Always
+        dnsPolicy: ClusterFirst
+  status: {}
+
+#RQC-agent
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: rqc-agent
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    labels:
+      app: rqc-agent
+    name: rqc-agent
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: 'rqc-agent:latest'
+    resources: {}
+    successfulBuildsHistoryLimit: 5
+    failedBuildsHistoryLimit: 5
+    strategy:
+      type: Docker
+      dockerStrategy:
+        dockerfilePath: Dockerfile
+    postCommit: {}
+    source:
+      contextDir: RQc-agent
+      type: Git
+      git:
+        ref: 'deploy-parameters'
+        uri: 'https://github.com/CQEN-QDCE/Demo2.git'
+    triggers:
+      - type: ConfigChange
+    runPolicy: Serial
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: rqc-agent
+    labels:
+      app: rqc-agent
+      app.kubernetes.io/part-of: RQc
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+      activeDeadlineSeconds: 21600
+    triggers:
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - rqc-agent
+          from:
+            kind: ImageStreamTag
+            name: 'rqc-agent:latest'
+    replicas: 1
+    revisionHistoryLimit: 10
+    test: false
+    selector:
+      app: rqc-agent
+    template:
+      metadata:
+        labels:
+          app: rqc-agent
+      spec:
+        containers:
+          - name: rqc-agent
+            command:
+              - bash
+              - -c
+              - $(echo aca-py start
+                --inbound-transport http '0.0.0.0' ${HTTP_INTERFACE_PORT}
+                $([ ! -z "${AGENT_ENDPOINT}" ] && echo "--endpoint ${AGENT_ENDPOINT}" || echo "")
+                --outbound-transport http
+                --admin 0.0.0.0 ${ADMIN_INTERFACE_PORT}
+                --genesis-url "${GENESIS_FILE_URL}"
+                --auto-accept-invites
+                --auto-accept-requests
+                --auto-respond-messages
+                --auto-respond-credential-proposal
+                --auto-respond-credential-offer
+                --auto-respond-credential-request
+                --auto-respond-presentation-proposal
+                --auto-respond-presentation-request
+                --auto-store-credential
+                --wallet-type 'indy'
+                --wallet-name "$(echo ${KMS_NAME} | tr '[:upper:]' '[:lower:]' | sed "s~-~_~g")"
+                --wallet-key "${MASTER_KEY}"
+                --wallet-storage-type "${KMS_STORAGE_TYPE}"
+                --wallet-storage-config "$(eval echo \"${KMS_STORAGE_CONFIGURATION}\")"
+                --wallet-storage-creds "$(eval echo \"${KMS_STORAGE_CREDENTIALS}\")"
+                $([ ! -z "${AGENT_DID_SEED}" ] && echo "--seed ${AGENT_DID_SEED}" || echo "")
+                $([ ! -z "${AGENT_ADMIN_API_KEY}" ] && echo "--admin-api-key ${AGENT_ADMIN_API_KEY}" || echo "--admin-insecure-mode")
+                --label '${AGENT_NAME}'
+                --log-level ${AGENT_LOG_LEVEL});
+            env:
+              - name: GENESIS_FILE_URL
+                value: ${GENESIS_FILE_URL}
+              - name: KMS_NAME
+                value: rqc-agent
+              - name: KMS_STORAGE_TYPE
+                value: ${KMS_STORAGE_TYPE}
+              - name: KMS_STORAGE_CONFIGURATION
+                value: ${KMS_STORAGE_CONFIG}
+              - name: KMS_STORAGE_CREDENTIALS
+                value: ${KMS_STORAGE_CREDS}
+              - name: POSTGRESQL_KMS_HOST
+                value: ${POSTGRESQL_KMS_HOST}
+              - name: POSTGRESQL_KMS_PORT
+                value: ${POSTGRESQL_KMS_PORT}
+              - name: POSTGRESQL_KMS_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: rqc-kms
+                    key: database-user
+              - name: POSTGRESQL_KMS_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: rqc-kms
+                    key: database-password
+              - name: POSTGRESQL_KMS_ADMIN_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: rqc-kms
+                    key: database-admin-user
+              - name: POSTGRESQL_KMS_ADMIN_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: rqc-kms
+                    key: database-admin-password
+              - name: MASTER_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: rqc-kms
+                    key: master-key
+              - name: AGENT_DID_SEED
+                valueFrom:
+                  secretKeyRef:
+                    name: rqc-kms
+                    key: agent-did-seed
+              - name: AGENT_DID
+                valueFrom:
+                  secretKeyRef:
+                    name: rqc-kms
+                    key: agent-did
+              - name: HTTP_INTERFACE_PORT
+                value: ${AGENT_HTTP_PORT}
+              - name: ADMIN_INTERFACE_PORT
+                value: ${AGENT_ADMIN_PORT}
+              - name: AGENT_ADMIN_API_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: rqc-kms
+                    key: admin-api-key
+              - name: AGENT_NAME
+                value: ${AGENT_NAME}
+              - name: AGENT_ENDPOINT
+                value: ${AGENT_ENDPOINT}
+              - name: AGENT_LOG_LEVEL
+                value: ${LOG_LEVEL}
+            image: " "
+            ports:
+              - containerPort: 3000
+                protocol: TCP
+              - containerPort: 8000
+                protocol: TCP
+            readinessProbe:
+              timeoutSeconds: 30
+              initialDelaySeconds: 3
+              exec:
+                command:
+                  - bash
+                  - "-c"
+                  - 'curl --fail "http://localhost:${ADMIN_INTERFACE_PORT}/status/ready" -H "X-API-KEY: ${AGENT_ADMIN_API_KEY}"'
+            livenessProbe:
+              timeoutSeconds: 30
+              initialDelaySeconds: 300
+              exec:
+                command:
+                  - bash
+                  - "-c"
+                  - 'curl --fail "http://localhost:${ADMIN_INTERFACE_PORT}/status/live" -H "X-API-KEY: ${AGENT_ADMIN_API_KEY}"'
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            imagePullPolicy: Always
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+        schedulerName: default-scheduler
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: rqc-agent
+  spec:
+    selector:
+      app: rqc-agent
+    ports:
+      - name: '3000'
+        protocol: TCP
+        port: 3000
+        targetPort: 3000
+      - name: '8000'
+        protocol: TCP
+        port: 8000
+        targetPort: 8000
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: rqc-agent
+  spec:
+    host: rqc-agent.apps.exp.lab.pocquebec.org
+    to:
+      kind: Service
+      name: rqc-agent
+      weight: 100
+    port:
+      targetPort: 8000
+    wildcardPolicy: None
+  status:
+    ingress:
+      - host: rqc-agent.apps.exp.lab.pocquebec.org
+        routerName: default
+        conditions:
+          - type: Admitted
+            status: 'True'
+        wildcardPolicy: None
+        routerCanonicalHostname: apps.exp.lab.pocquebec.org
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: rqc-agent-admin
+  spec:
+    host: rqc-agent-admin.apps.exp.lab.pocquebec.org
+    to:
+      kind: Service
+      name: rqc-agent
+      weight: 100
+    port:
+      targetPort: 3000
+    wildcardPolicy: None
+  status:
+    ingress:
+      - host: rqc-agent-admin.apps.exp.lab.pocquebec.org
+        routerName: default
+        conditions:
+          - type: Admitted
+            status: 'True'
+        wildcardPolicy: None
+        routerCanonicalHostname: apps.exp.lab.pocquebec.org
+
+#RQC-controller
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: rqc-controller
+  data:
+    config.js: |
+      window.env = {
+        IDENTITY_SCHEMA_NAME: "${IDENTITY_SCHEMA_NAME}",
+        IDENTITY_SCHEMA_VERSION: "${IDENTITY_SCHEMA_VERSION}",
+        AGENT_DID: "${AGENT_DID}",
+        IDENTITY_CREDENTIAL_DEFINITION: "${IDENTITY_CREDENTIAL_DEFINITION}"
+      }
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: rqc-controller
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    annotations:
+      app.openshift.io/vcs-uri: https://github.com/CQEN-QDCE/Demo2.git
+      template.alpha.openshift.io/wait-for-ready: "true"
+    labels:
+      app: rqc-controller
+    name: rqc-controller
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: rqc-controller:latest
+    source:
+      contextDir: RQc-controller
+      git:
+        ref: 'deploy-parameters'
+        uri: https://github.com/CQEN-QDCE/Demo2.git
+      type: Git
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile
+      type: Docker
+    triggers:
+      - type: ConfigChange
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: rqc-controller
+    labels:
+      app: rqc-controller
+      app.kubernetes.io/part-of: RQc
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+      activeDeadlineSeconds: 21600
+    triggers:
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - rqc-controller
+          from:
+            kind: ImageStreamTag
+            name: "rqc-controller:latest"
+    replicas: 1
+    revisionHistoryLimit: 10
+    test: false
+    selector:
+      app: rqc-controller
+    template:
+      metadata:
+        labels:
+          app: rqc-controller
+      spec:
+        containers:
+          - name: rqc-controller
+            env:
+              - name: REACT_APP_ISSUER_HOST_URL
+                value: ${AGENT_ADMIN_ENDPOINT}
+            image: " "
+            volumeMounts:
+              - name: config-volume
+                mountPath: /opt/app-root/src/build/config
+            ports:
+              - containerPort: 11000
+                protocol: TCP
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            imagePullPolicy: Always
+        volumes:
+          - name: config-volume
+            configMap:
+              name: rqc-controller
+              items:
+              - key: "config.js"
+                path: "config.js"
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+        schedulerName: default-scheduler
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: rqc-controller
+  spec:
+    selector:
+      app: rqc-controller
+    ports:
+      - name: "11000"
+        protocol: TCP
+        port: 11000
+        targetPort: 11000
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: rqc-controller2
+  spec:
+    host: rqc-controller2.apps.exp.lab.pocquebec.org
+    to:
+      kind: Service
+      name: rqc-controller
+      weight: 100
+    port:
+      targetPort: 11000
+    wildcardPolicy: None
+  status:
+    ingress:
+      - host: rqc-controller2.apps.exp.lab.pocquebec.org
+        routerName: default
+        conditions:
+          - type: Admitted
+            status: "True"
+        wildcardPolicy: None
+        routerCanonicalHostname: apps.exp.lab.pocquebec.org
+parameters:
+- name: GITHUB_WEBHOOK_SECRET
+  description: A secret string used to configure the GitHub webhook for the marketplace app build
+  generate: expression 
+  from: "[a-zA-Z0-9]{40}"
+  required: true
+- name: POSTGRESQL_PASSWORD
+  displayName: PostgreSQL connection password
+  description: Password for the PostgreSQL connection user. Needs to be basee64 encoded.
+  required: true
+  generate: "expression"
+  from: "[a-zA-Z0-9]{16}"
+- name: POSTGRESQL_ADMIN_PASSWORD
+  displayName: PostgreSQL administrator password
+  description: Password for the PostgreSQL administrative account. Needs to be basee64 encoded.
+  required: true
+  generate: "expression"
+  from: "[a-zA-Z0-9]{16}"
+- name: POSTGRESQL_DATABASE_NAME
+  displayName: PostgreSQL database name
+  description: Name of the PostgreSQL database.
+  required: true
+  value: "kms"
+- name: GENESIS_FILE_URL
+  displayName: Genesis file URL
+  description: The URL from which the genesis file can be downloaded.
+  required: true
+  value: http://vonx.pocquebec.org:9000/genesis
+- name: LOG_LEVEL
+  displayName: Log Level
+  description: The logging level of the agent.
+  required: true
+  value: WARNING
+- name: POSTGRESQL_KMS_HOST
+  displayName: PostgreSql key management service hostname
+  required: true
+  description: Hostname of the deployed PostgreSql key management service.  Only used when KMS_STORAGE_TYPE = postgres_storage.
+  value: rqc-kms
+- name: POSTGRESQL_KMS_PORT
+  displayName: PostgreSql key management service port
+  required: true
+  description: The port number of the deployed PostgreSql key management service.  Only used when KMS_STORAGE_TYPE = postgres_storage.
+  value: "5432"
+- name: KMS_STORAGE_TYPE
+  displayName: Key management service storage type
+  description: The key management service storage type.  Your choice of 'postgres_storage' or 'sqlite_storage' at the moment.  If not defined, defaults to 'sqlite_storage' for compatibility.
+  required: false
+  value: postgres_storage
+- name: AGENT_ADMIN_PORT
+  displayName: Agent Admin Port
+  description: The admin port on which the service will listen.
+  required: true
+  value: "3000"
+- name: AGENT_HTTP_PORT
+  displayName: Agent http port
+  description: The http port on which the service will listen.
+  required: true
+  value: "8000"
+- name: MASTER_KEY
+  displayName: Master key
+  description: The encryption key to be used for the the key management service.
+  required: true
+  generate: "expression"
+  from: "[a-zA-Z0-9]{16}"
+- name: AGENT_DID_SEED
+  displayName: Agent DID seed.
+  description: Seed used to create the agent DID.
+  required: true
+  value: "0000000000000000000000RegistreQc"
+- name: AGENT_DID
+  displayName: Agent DID
+  description: The public DID associated to the agent.
+  required: false
+  value: "G15uJpKsf9JnvYCN54Sd28"
+- name: ADMIN_API_KEY
+  displayName: Agent admin API key
+  description: The key used to authenticate client requests to the admin api.
+  required: false
+  value: ""
+- name: KMS_STORAGE_CONFIG
+  displayName: Key management service storage configuration
+  required: true
+  description: The key management service storage configuration.
+  value: '{\"url\":\"${POSTGRESQL_KMS_HOST}:${POSTGRESQL_KMS_PORT}\",\"max_connections\":5}'
+- name: KMS_STORAGE_CREDS
+  displayName: Key management service storage credentials
+  required: true
+  description: The key management service credentials.
+  value: '{\"account\":\"${POSTGRESQL_KMS_USER}\",\"password\":\"${POSTGRESQL_KMS_PASSWORD}\",\"admin_account\":\"${POSTGRESQL_KMS_ADMIN_USER}\",\"admin_password\":\"${POSTGRESQL_KMS_ADMIN_PASSWORD}\"}'
+- name: AGENT_NAME
+  displayName: Agent name
+  description: The name of the agent.
+  required: true
+  value: "Registre-Québec"
+- name: IDENTITY_SCHEMA_ID
+  displayName: Identity schema id
+  description: The id of the identity schema.
+  required: true
+  value: "Ep31SvFAetugFPe5CGzJxt:2:IQNIDENTITE:0.1.5"
+- name: IDENTITY_SCHEMA_NAME
+  displayName: Identity schema name
+  description: The name of the identity schema.
+  required: true
+  value: "IQNIDENTITE"
+- name: IDENTITY_SCHEMA_VERSION
+  displayName: Identity schema version
+  description: The version of the identity schema.
+  required: true
+  value: "0.1.5"
+- name: IDENTITY_CREDENTIAL_DEFINITION
+  displayName: Credential definition identity
+  description: The crdential definition of the identity.
+  required: true
+  value: "Ep31SvFAetugFPe5CGzJxt:3:CL:1664:Identite-IQN"
+- name: AGENT_ENDPOINT
+  displayName: Agent endpoint
+  description: The endpoint of the agent.
+  required: true
+  value: "http://rqc-agent.apps.exp.lab.pocquebec.org"
+- name: AGENT_ADMIN_ENDPOINT
+  displayName: Agent admin endpoint
+  description: The endpoint of the agent.
+  required: true
+  value: "http://rqc-agent-admin.apps.exp.lab.pocquebec.org"

@@ -1,0 +1,28 @@
+{
+    "en": "English", 
+    "de": "Deutsch", 
+    "fr": "Français", 
+    "pt": "Português",
+    "en-s": "EN", 
+    "pt-s": "PT", 
+    "fr-s": "FR",
+    "de-s": "DE",
+    "copyright": "© QDCE - Quebec's Digital Center of Excellence, Quebec 2020. All rights reserved.",
+    "welcomeMessage": "This site allows, by the way of experimentations, to explore the technical concepts that supports the relationship between a crendential's holder-subject, and evaluate the models that let us support a delegation relationship for the gouvernment's identity credentials. ",
+    "btnLogin": "Login", 
+    "btnLogout": "Logout",
+    "login": "Login", 
+    "username": "Username", 
+    "password": "Password", 
+    "btnSend": "Send", 
+    "formLoginMsg": "If you need more usage information, please refer to the README.md page.", 
+    "modalLoginMsg": "Login info", 
+    "modalCorrectInfoMsg": "Please, type in the right informations.", 
+    "ok": "OK",
+    "noauthMsg1": "You are lost somewhere...", 
+    "noauthMsg2": "You shouldn't be here!",
+    "gender":{
+        "male": "Male", 
+        "female": "Female"
+    }
+} 

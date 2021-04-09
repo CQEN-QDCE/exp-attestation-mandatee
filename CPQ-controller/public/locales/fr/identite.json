@@ -1,0 +1,48 @@
+{
+    "digitalID": "Attestation numérique d'identité gouvernementale",
+    "id": "Identité", 
+    "type": "Type",
+    "issuer": "Émetteur", 
+    "holder": {
+        "you": "Vous", 
+        "child": "Votre enfant",
+        "id": "Id du contrôlleur", 
+        "type": "Type de contrôlleur"
+    }, 
+    "issuanceDate": "Date d'émission", 
+    "expirationDate": "Date d'expiration", 
+    "credentialSubject": {
+        "id": "Id du sujet", 
+        "firstNames": "Prénom", 
+        "lastName": "Nom de famille", 
+        "gender": "Genre", 
+        "birthplace": "Lieu de naissance", 
+        "birthDate": "Date de naissance", 
+        "fatherFullName": "Nom complet du père", 
+        "motherFullName": "Nom complet de la mère", 
+        "registrationNumber": "Numéro de registre", 
+        "depNativeLanguage": "Langue maternelle", 
+        "depIdentifyingMarks": "Marques d'identification"
+    }, 
+    "btnIssue": "Émettre mandat de curatelle",
+    "ANIGIdentity": "Identité ANIG",
+    "modalMessage": "Merci de remplir tous les champs obligatoires (*).",
+    "ok": "OK", 
+    "btnAuthorizeIdentity": "Autoriser émission du mandat de curatelle",
+    "msgIdentityIssued": "Ce mandat de curatelle a été autorisée et émise.", 
+    "msgPending" : "En attente de réponse!", 
+    "msgIssueSuccess": "Le mandat de curatelle a été émis avec succès.", 
+    "msgIssueSuccessCompl" : "Le mandat de curatelle a été émise avec succès. Pour tester la vérification de cette attestation, visitez le site du vérificateur.", 
+    "btnVerifyCred" : "Vérifier l'attestation.",
+    "lblVerification" : "Vérification d'identité ",
+    "msgVerification1" : "Veuillez répondre à la demande de preuve d'identité envoyée à votre portefeuille, sur votre appareil mobile.", 
+    "msgVerification2" : "L'attestation présentée sera validée en conséquence.",
+    "infoANIGIdentity": "Informations de l'identité émise", 
+    "msgIssuance1": "Émission du mandat de curatelle", 
+    "msgIssuance2": "Veuillez accepter l'offre d'identité envoyée à votre portefeuille, sur votre appareil mobile.", 
+    "msgIssuance3": "L'attestation présentée sera validée et émise en conséquence. ", 
+    "msgWait": "Merci de patienter...",
+    "father": "Père", 
+    "mother": "Mère"
+    
+}

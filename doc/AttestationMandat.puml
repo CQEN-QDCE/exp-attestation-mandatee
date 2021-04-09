@@ -1,0 +1,112 @@
+@startuml Sequence
+
+    Demandeur   -->  RegistreQc  :  Demande identité personelle ANIG 
+    Demandeur   <--  RegistreQc  :  Émettre l'attestation ANIG 
+    Demandeur   -->  Demandeur   :  Enregistrer attestation dans le portefeuille 
+    Demandeur   -->  Curateur    :  Demande la curatelle d'une personne 
+    Curateur    -->  Curateur    :  Vérifie le procès off-chain de demande de curatelle 
+    Demandeur   <--  Curateur    :  Demande présentation de l'identité ANIG 
+    Demandeur   -->  Curateur    :  Présente identité ANIG perso 
+    Curateur    -->  Curateur    :  Vérifie identité ANIG versus données off-chain 
+    Demandeur   <--  Curateur    :  Envoie une offre d'émission d'attestation de curatelle
+    Demandeur   -->  Demandeur   :  Accepte offre d'attestation de curatelle et enregistre dans portefeuille
+    Demandeur   -->  RegistreQc  :  Fait demande d'identité par curatelle 
+    Demandeur   <--  RegistreQc  :  Demande présentation d'attestation de curatelle ( + ANIG ) 
+    Demandeur   -->  RegistreQc  :  Présente attestation de curatelle 
+    RegistreQc  -->  RegistreQc  :  Vérifie infos de la curatelle et du demandeur 
+    Demandeur   <--  RegistreQc  :  Envoie offre d'émission d'attestation d'identité ANIG de la personné reprensentée
+    Demandeur   -->  Demandeur   :  Accepte offre d'attestation d'identité ANIG de la personne representée et enregistre dans portefeuille
+
+@enduml
+
+'  Diagramme qui décrit les schemas adoptés 
+@startuml SchemaRegistreIdentiteQc
+
+' hide circle 
+hide circle 
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+    entity "RegistreIdentiteQc" as sch01 {
+        @context 
+        id
+        type 
+        credentialSchema
+        issuanceDate 
+        expirationDate
+        issuer 
+        trustFramework 
+        --
+        credentialSubject.id
+        credentialSubject.firstNames
+        credentialSubject.lastName
+        credentialSubject.birthDate
+        credentialSubject.birthplace
+        credentialSubject.gender
+        credentialSubject.fatherFullName
+        credentialSubject.motherFullName
+    }
+
+
+    
+
+@enduml
+
+'  Diagramme qui décrit les schemas adoptés 
+@startuml SchemaMandatCuratelle 
+
+' hide circle 
+hide circle 
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+    entity "MandatCuratelle" as sch02 { 
+        @context 
+        id
+        type 
+        credentialSchema
+        issuanceDate 
+        expirationDate
+        issuer 
+        trustFramework 
+        auditURI
+        appealURI
+        --
+        credentialSubject.holder.type
+        credentialSubject.holder.role
+        credentialSubject.holder.rationaleURI
+        credentialSubject.holder.firstNames
+        credentialSubject.holder.lastName
+        credentialSubject.holder.birthDate
+        credentialSubject.holder.birthplace
+        credentialSubject.holder.gender
+        credentialSubject.holder.fatherFullName
+        credentialSubject.holder.motherFullName
+        credentialSubject.holder.constraints.boundaries
+        credentialSubject.holder.constraints.pointOfOrigin
+        credentialSubject.holder.constraints.radiusKM
+        credentialSubject.holder.constraints.jurisdictions
+        credentialSubject.holder.constraints.trigger
+        credentialSubject.holder.constraints.circumstances
+        credentialSubject.holder.constraints.startTime
+        credentialSubject.holder.constraints.endTime
+        --
+        credentialSubject.proxied.type
+        credentialSubject.proxied.permissions
+        credentialSubject.proxied.firstNames
+        credentialSubject.proxied.lastName
+        credentialSubject.proxied.birthDate
+        credentialSubject.proxied.birthplace
+        credentialSubject.proxied.gender
+        credentialSubject.proxied.fatherFullName
+        credentialSubject.proxied.motherFullName
+        credentialSubject.proxied.nativeLanguage
+        credentialSubject.proxied.identifyingMarks
+        credentialSubject.proxied.photo
+        credentialSubject.proxied.iris
+        credentialSubject.proxied.fingerprint 
+    }
+
+@enduml

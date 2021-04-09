@@ -1,0 +1,112 @@
+# /*
+# * Copyright (c) 2020 Gouvernement du Québec
+# * 
+# * SPDX-License-Identifier: LiLiQ-R-v.1.1
+# * License-Filename: /LICENSE
+# */
+# 
+#  .gitignore file pour projets ReactJS et ReactNativeJS 
+#
+# ************************************************************************************
+#  L I S T E   D E S   F I C H I E R S   I G N O R E S   C R E E   P A R   R E A C T *
+# ************************************************************************************
+#
+### react ###
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+
+node_modules
+bower_components
+build
+
+*.sublime*
+
+psd
+thumb
+sketch
+
+# lock-files 
+package-lock.json
+yarn.lock
+
+# **************************************************************************************
+#  L I S T E   D E S   F I C H I E R S   I G N O R E S   C R E E   P A R   V S C O D E *
+# **************************************************************************************
+# 
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+
+# **************************************************************************************
+#  L I S T E   D E S   F I C H I E R S   I G N O R E S   C R E E   P A R   m a c O S   *
+# **************************************************************************************
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+
+
+# ****************************************************************************************
+#  L I S T E   D E S   F I C H I E R S   I G N O R E S   C R E E   P A R   W I N D O W S *
+# ****************************************************************************************
+#
+### Windows ###
+# Windows thumbnail cache files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.stackdump
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# Fichiers divers du projet, à ne pas commiter
+REQ.attestation.http
+REQ.issuer.http
+dev
+*.tar.gz
