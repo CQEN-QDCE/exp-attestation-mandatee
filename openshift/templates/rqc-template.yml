@@ -185,7 +185,6 @@ objects:
       contextDir: RQc-agent
       type: Git
       git:
-        ref: 'deploy-parameters'
         uri: 'https://github.com/CQEN-QDCE/Demo2.git'
     triggers:
       - type: ConfigChange
@@ -449,7 +448,6 @@ objects:
     source:
       contextDir: RQc-controller
       git:
-        ref: 'deploy-parameters'
         uri: https://github.com/CQEN-QDCE/Demo2.git
       type: Git
     strategy:
