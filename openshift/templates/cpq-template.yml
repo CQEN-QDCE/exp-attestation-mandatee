@@ -537,9 +537,9 @@ objects:
 - kind: Route
   apiVersion: v1
   metadata:
-    name: cpq-controller2
+    name: cpq-controller
   spec:
-    host: cpq-controller2.apps.exp.lab.pocquebec.org
+    host: cpq-controller.apps.exp.lab.pocquebec.org
     to:
       kind: Service
       name: cpq-controller
@@ -549,7 +549,7 @@ objects:
     wildcardPolicy: None
   status:
     ingress:
-      - host: cpq-controller2.apps.exp.lab.pocquebec.org
+      - host: cpq-controller.apps.exp.lab.pocquebec.org
         routerName: default
         conditions:
           - type: Admitted
