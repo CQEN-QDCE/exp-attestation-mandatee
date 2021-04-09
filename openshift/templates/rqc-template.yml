@@ -539,9 +539,9 @@ objects:
 - kind: Route
   apiVersion: v1
   metadata:
-    name: rqc-controller2
+    name: rqc-controller
   spec:
-    host: rqc-controller2.apps.exp.lab.pocquebec.org
+    host: rqc-controller.apps.exp.lab.pocquebec.org
     to:
       kind: Service
       name: rqc-controller
@@ -551,7 +551,7 @@ objects:
     wildcardPolicy: None
   status:
     ingress:
-      - host: rqc-controller2.apps.exp.lab.pocquebec.org
+      - host: rqc-controller.apps.exp.lab.pocquebec.org
         routerName: default
         conditions:
           - type: Admitted
