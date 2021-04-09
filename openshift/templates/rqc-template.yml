@@ -185,7 +185,7 @@ objects:
       contextDir: RQc-agent
       type: Git
       git:
-        uri: 'https://github.com/CQEN-QDCE/Demo2.git'
+        uri: 'https://github.com/CQEN-QDCE/exp-attestation-mandatee.git'
     triggers:
       - type: ConfigChange
     runPolicy: Serial
@@ -435,7 +435,7 @@ objects:
   apiVersion: v1
   metadata:
     annotations:
-      app.openshift.io/vcs-uri: https://github.com/CQEN-QDCE/Demo2.git
+      app.openshift.io/vcs-uri: https://github.com/CQEN-QDCE/exp-attestation-mandatee.git
       template.alpha.openshift.io/wait-for-ready: "true"
     labels:
       app: rqc-controller
@@ -448,7 +448,7 @@ objects:
     source:
       contextDir: RQc-controller
       git:
-        uri: https://github.com/CQEN-QDCE/Demo2.git
+        uri: https://github.com/CQEN-QDCE/exp-attestation-mandatee.git
       type: Git
     strategy:
       dockerStrategy:
