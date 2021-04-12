@@ -35,7 +35,7 @@ Content-Type: application/json
 
 {
     "schema_name": "Identité Gouvernementale",
-    "schema_version": "0.4",
+    "schema_version": "1.1",
     "attributes": [
         "@context", 
         "id", 
@@ -59,7 +59,7 @@ Content-Type: application/json
 
 #### 1678
               
-@schema_id = "G15uJpKsf9JnvYCN54Sd28:2:Identité Gouvernementale:0.4"
+@schema_id = "G15uJpKsf9JnvYCN54Sd28:2:Identité Gouvernementale:1.1"
 @cred_def_id = "23YD3dyHuyFvLpLC3zF58F:3:CL:1678:Registre_Identite_Qc"
 # G15uJpKsf9JnvYCN54Sd28:3:CL:1635:Registre_Identite_Qc
 

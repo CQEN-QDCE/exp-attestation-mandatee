@@ -51,7 +51,7 @@ function MandatCuratelleForm(props){
     const credId       = 'https://iqn-trustframework.apps.exp.lab.pocquebec.org/2020/credentials/iqn/delegation/v1/MandatCuratelle.json';
     const credType     = '["VerifiableCredential", "Proxy.G/IQNTrustFramework/1.0/delegation]';
     const credSchema   =  process.env.REACT_APP_CRED_DEF_ID_RQC; 
-    const credIssuer   =  process.env.REACT_APP_SCHEMA_ISSUER_DID_IDENTITE; 
+    const credIssuer   =  window.env && window.env.AGENT_DID ? window.env.AGENT_DID : process.env.REACT_APP_SCHEMA_ISSUER_DID_IDENTITE; 
     const credTrustFw  = 'http://iqn-trustframework.apps.exp.lab.pocquebec.org/'; 
     const auditURI     = 'https://audit.org/report';
     const appealURI    = 'did:sov:U86Z58d6TV7PB';

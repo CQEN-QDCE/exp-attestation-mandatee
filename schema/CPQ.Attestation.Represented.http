@@ -38,7 +38,7 @@ Content-Type: application/json
 
 {
     "schema_name": "Identité Gouvernementale",
-    "schema_version": "0.5",
+    "schema_version": "1.0",
     "attributes": [
         "@context", 
         "id", 
@@ -62,7 +62,7 @@ Content-Type: application/json
 
 #### 
               
-@schema_id = "DPm1o7E4GUZBEHsEXhnqhD:2:Identité Gouvernementale:0.5"
+@schema_id = "DPm1o7E4GUZBEHsEXhnqhD:2:Identit\u00e9 Gouvernementale:1.0"
 @cred_def_id = "23YD3dyHuyFvLpLC3zF58F:3:CL:1635:Registre_Identite_Qc"
 
 
@@ -107,7 +107,7 @@ Content-Type: application/json
 
 {
   "schema_name": "Mandat de Curatelle",
-  "schema_version": "0.3",
+  "schema_version": "1.0",
   "attributes": [
         "@context", 
         "id", 
@@ -157,7 +157,7 @@ Content-Type: application/json
 #### Noter qu'il donne support à la revocation de l'attestation.
 ####
 # 
-@schema_mandat_curatelle = "2dRxhexBiWbj2BmbcHziBQ:2:Mandat de Curatelle:0.3"
+@schema_mandat_curatelle = "DPm1o7E4GUZBEHsEXhnqhD:2:Mandat de Curatelle:1.0"
 POST {{hostname}}/credential-definitions HTTP/1.1
 Content-Type: application/json
 X-API-Key: secret
