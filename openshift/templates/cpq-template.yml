@@ -588,7 +588,7 @@ parameters:
   displayName: Log Level
   description: The logging level of the agent.
   required: true
-  value: DEBUG
+  value: WARNING
 - name: POSTGRESQL_KMS_HOST
   displayName: PostgreSql key management service hostname
   required: true
