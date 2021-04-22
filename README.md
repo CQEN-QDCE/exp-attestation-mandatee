@@ -114,6 +114,13 @@ documentation se retrouvant sur ce lien [procédure d\'installation](openshift/t
   utilisées dans les formulaires d\'entrée de données de la PES d\'émission
   d\'attestation.
 
+<p align="center">
+  <img src="images/EnvironnementTest.png" label="Environnement de test" />
+
+  <br>
+  <b>Schéma des composants utilisés pour réaliser l'expérimentation</b>
+</p>
+
 ## 3.2 Médias standard disponibles
 
 Quelques médias d\'image standards ont été crées et déposées dans le répertoire [d\'Avatars](./images/Avatar). Ces images peuvent être utilisées dans les formulaires d\'entrée de données de la PES d\'émission d\'attestation.
