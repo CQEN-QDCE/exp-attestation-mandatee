@@ -56,36 +56,29 @@ régler les contraintes et particularités d\'un cas d\'affaires concret.
   <b>Contexte de l'histoire de Luc et Solange</b>
 </p>
 
-1.  Luc fait une demande pour une attestation de mandat auprès du
-    tribunal;
+1.  Luc fait une demande pour une attestation de mandat auprès du tribunal;
 
-2.  Le tribunal requiert l\'attestation numérique d\'identité de Luc et
-    les documents permettant au tribunal de statuer.
+2.  Le tribunal requiert l\'attestation numérique d\'identité de Luc et les documents permettant au tribunal de statuer.
 
-3.  Luc consent à présenter son attestation numérique d\'identité et la
-    documentation;
+3.  Luc consent à présenter son attestation numérique d\'identité et la documentation;
 
 4.  Le tribunal valide l\'attestation et la documentation;
 
-5.  Le tribunal émet l\'attestation du mandat à ~~la~~ Luc;
+5.  Le tribunal émet l\'attestation du mandat à Luc;
 
 6.  Le tribunal consigne l\'émission dans le dépôt de clé sécurisé de son agent.
 
-7.  Luc fait une demande pour l\'attestation numérique d\'identité de
-    Solange auprès du Registre d\'identité Québec ~~DEC~~;
+7.  Luc fait une demande pour l\'attestation numérique d\'identité de Solange auprès du Registre d\'identité Québec (RIQ);
 
-8.  Le RIQ ~~DEC~~ requiert l\'attestation numérique d\'identité de Luc et
-    l\'attestation de mandat;
+8.  Le RIQ requiert l\'attestation numérique d\'identité de Luc et l\'attestation de mandat;
 
-9.  Luc consent à présenter son attestation numérique d\'identité et
-    l\'attestation de mandat;
+9.  Luc consent à présenter son attestation numérique d\'identité et l\'attestation de mandat;
 
-10. Le RIQ ~~DEC~~ valide les attestations;
+10. Le RIQ valide les attestations;
 
-11. Le RIQ ~~DEC~~ émet l\'attestation numérique d\'identité de Solange à
-    la Luc;
+11. Le RIQ émet l\'attestation numérique d\'identité de Solange à la Luc;
 
-12. Le RIQ ~~DEC~~ consigne l\'émission dans le dépôt de clé sécurisé de son agent.
+12. Le RIQ consigne l\'émission dans le dépôt de clé sécurisé de son agent.
 
 # 3.0 Environnement d\'expérimentation
 
@@ -96,12 +89,11 @@ documentation se retrouvant sur ce lien [procédure d\'installation](openshift/t
 
 - Un (1) portefeuille numérique appartenant à Luc est disponible;
 
-- Un répertoire distribué identitaire se conformant au _W3C -- VC Data
+- Un répertoire distribué identitaire se conformant au _W3C - VC Data
   Model 1.0_ est en place et permet d\'émettre des attestations ainsi
   que les schémas associés;
 
-- Un émetteur et consommateur d\'attestations d\'identité ~~représentant
-  le DEC~~ est en place;
+- Un émetteur et consommateur d\'attestations d\'identité est en place;
 
 - Un émetteur et consommateur d\'attestations de mandat représentant le
   Tribunal est en place;
