@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/badge/Licence-LiLiQ--R-blue)](LICENSE)
 
 # Émettre une attestation d'identité dont le détenteur n'est pas le sujet, par un organisme qui se base sur l'émission d'une attestation de mandat d'un autre organisme
-Voici les travaux réalisés dans le cadre d'une expérimentation basée sur le concept de l\'identité numérique. Le sujet: l\'émission d'une attestation par mandat de curatelle émis par le Curateur Publique du Québec.
+Voici les travaux réalisés dans le cadre d'une expérimentation basée sur le concept de l\'identité numérique. Le sujet: l\'émission d'une attestation par mandat de curatelle émis par le Curateur Publique du Québec dans le but d\'explorer les concepts techniques de la relation vérifiable et évaluer des modèles permettant de soutenir la relation mandataire-mandant pour l'attestation d'identité gouvernementale. 
 ## Table des matières
 
 1. [Objectifs](#10-objectifs)
@@ -349,5 +349,3 @@ ToDo
 
 # 8.0 Conclusion
 ToDo
-
-Questions à répondre et points à considérer dans nos expérimentations
