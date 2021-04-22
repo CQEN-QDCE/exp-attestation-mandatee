@@ -50,7 +50,7 @@ régler les contraintes et particularités d\'un cas d\'affaires concret.
 > obtenir les différents services au nom de cette dernière._
 
 <p align="center">
-  <img src="Images/Contexte1.png" label="Contexte d\'Alice" />
+  <img src="images/Contexte1.png" label="Contexte d\'Alice" />
 
   <br>
   <b>Contexte de l'histoire de Luc et Solange</b>
@@ -110,7 +110,7 @@ documentation se retrouvant sur ce lien [procédure d\'installation](openshift/t
   exécutées de manière appropriée lorsque mentionnées;
 
 - Quelques médias d\'image standards ont été crées et déposées dans le
-  répertoire [d\'Avatars](./Images/Avatar). Ces images peuvent être
+  répertoire [d\'Avatars](./images/Avatar). Ces images peuvent être
   utilisées dans les formulaires d\'entrée de données de la PES d\'émission
   d\'attestation.
 
