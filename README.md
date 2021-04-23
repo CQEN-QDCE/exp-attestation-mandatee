@@ -341,8 +341,12 @@ b) Attestation de mandat
 
 # 7.0 Analyse
 
-ToDo
+Dans un modèle de contrôle indirect de l\'identité, c\'est la
+relation _détenteur -- sujet_ basé sur une autre relation _mandataire -- mandant_
+qui permet ultimement à un individu de « posséder » une attestation traitant d\'un autre individu.
+
+TODO
 
 # 8.0 Conclusion
 
-ToDo
+TODO
