@@ -27,14 +27,14 @@ Voici les travaux réalisés dans le cadre d\'une expérimentation basée sur le
 
 8. [Conclusion](#80-conclusion)
 
-# 1.0 Objectifs
+## 1.0 Objectifs
 
 - Explorer les concepts techniques de la relation vérifiable.
 
 - Évaluer des modèles permettant de soutenir la relation
   mandataire-mandant pour l\'attestation d\'identité gouvernementale.
 
-# 2.0 Contexte
+## 2.0 Contexte
 
 Le contrôle indirect de l\'identité est complexe. Un cas d\'utilisation
 minimal a été élaboré afin de permettre la mise en place de toutes les
@@ -80,12 +80,12 @@ régler les contraintes et particularités d\'un cas d\'affaires concret.
 
 12. Le RIQ consigne l\'émission dans le dépôt de clé sécurisé de son agent.
 
-# 3.0 Environnement d\'expérimentation
+## 3.0 Environnement d\'expérimentation
 
 L\'environnement d\'expérimentation peut être créé et reproduit en suivant la
 documentation se retrouvant sur ce lien [procédure d\'installation](openshift/templates/README.md). Elle permet l/'installation et l/'exécution de l\'expérimentation.
 
-## 3.1 Conditions initiales et prémisses
+### 3.1 Conditions initiales et prémisses
 
 - Un (1) portefeuille numérique appartenant à Luc est disponible;
 
@@ -121,11 +121,11 @@ documentation se retrouvant sur ce lien [procédure d\'installation](openshift/t
   <b>Schéma des composants utilisés pour réaliser l'expérimentation</b>
 </p>
 
-## 3.2 Médias standard disponibles
+### 3.2 Médias standard disponibles
 
 Quelques médias d\'image standards ont été crées et déposées dans le répertoire [d\'Avatars](./images/Avatar). Ces images peuvent être utilisées dans les formulaires d\'entrée de données de la PES d\'émission d\'attestation.
 
-# 4.0 Démarche
+## 4.0 Démarche
 
 <p align="center">
   <img src="images/Sequence.png" label="Séquence" />
@@ -316,9 +316,7 @@ En exemple, l\'attestation du mandat délivré à luc (détenteur) pour sa mère
 
 <b>Tableau 3 - Données de l\'attestation du mandat</b>
 
-#
-
-# 6.0 Résultats attendus
+## 6.0 Résultats attendus
 
 Deux schemas d\'attestation se retrouvent dans le répertoire de schemas. Ils doivent permettre:
 
@@ -339,7 +337,7 @@ b) Attestation de mandat
   détentrice de l\'attestation d\'identité de la personne dépendante
   émise par Registre Québec.
 
-# 7.0 Analyse
+## 7.0 Analyse
 
 Dans un modèle de contrôle indirect de l\'identité, c\'est la
 relation _détenteur -- sujet_ basé sur une autre relation _mandataire -- mandant_
@@ -347,6 +345,6 @@ qui permet ultimement à un individu de « posséder » une attestation traita
 
 TODO
 
-# 8.0 Conclusion
+## 8.0 Conclusion
 
 TODO
