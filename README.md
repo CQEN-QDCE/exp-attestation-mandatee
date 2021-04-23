@@ -27,6 +27,9 @@ Voici les travaux réalisés dans le cadre d\'une expérimentation basée sur le
 
 8. [Conclusion](#80-conclusion)
 
+9. [Licence](#90-licence)
+---
+
 ## 1.0 Objectifs
 
 - Explorer les concepts techniques de la relation vérifiable.
@@ -348,3 +351,5 @@ TODO
 ## 8.0 Conclusion
 
 TODO
+## 9.0 Licence
+Distribué sous Licence Libre du Québec – Réciprocité (LiLiQ-R). Voir [LICENCE](LICENSE) pour plus d'informations.
