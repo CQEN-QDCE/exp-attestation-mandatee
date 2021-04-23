@@ -1,21 +1,41 @@
 @startuml Sequence
 
+actor "Luc" as Demandeur  order 100
+participant "Regitre d'identité Québec" as RegistreQc  order 110
+participant "Curateur Public du Québec" as Curateur  order 120
+database "Registre distribué" as RegistreD  order 130
+
+== Émission d'une attestation dont le sujet n'est pas le détenteur à travers une relation mandataire-mandant pour l'attestation d'identité ==
+
+' Préalable
+group "Préalable / Émettre l'identité de Luc"
     Demandeur   -->  RegistreQc  :  Demande identité personelle ANIG 
     Demandeur   <--  RegistreQc  :  Émettre l'attestation ANIG 
     Demandeur   -->  Demandeur   :  Enregistrer attestation dans le portefeuille 
+end
+
+' Demande d'un mandat de curatelle
+group "Émettre l'attestation du mandat à Luc"
     Demandeur   -->  Curateur    :  Demande la curatelle d'une personne 
     Curateur    -->  Curateur    :  Vérifie le procès off-chain de demande de curatelle 
     Demandeur   <--  Curateur    :  Demande présentation de l'identité ANIG 
     Demandeur   -->  Curateur    :  Présente identité ANIG perso 
+    Curateur    -->  RegistreD   :  Validation de l'autenticité des informations
     Curateur    -->  Curateur    :  Vérifie identité ANIG versus données off-chain 
     Demandeur   <--  Curateur    :  Envoie une offre d'émission d'attestation de curatelle
     Demandeur   -->  Demandeur   :  Accepte offre d'attestation de curatelle et enregistre dans portefeuille
+end
+
+' Réception de l'identité basé sur un mandat
+group "Émettre l'identité de la mère au mandataire basé sur le mandat"
     Demandeur   -->  RegistreQc  :  Fait demande d'identité par curatelle 
     Demandeur   <--  RegistreQc  :  Demande présentation d'attestation de curatelle ( + ANIG ) 
     Demandeur   -->  RegistreQc  :  Présente attestation de curatelle 
+    RegistreQc  -->  RegistreD   :  Validation de l'autenticité des informations
     RegistreQc  -->  RegistreQc  :  Vérifie infos de la curatelle et du demandeur 
     Demandeur   <--  RegistreQc  :  Envoie offre d'émission d'attestation d'identité ANIG de la personné reprensentée
     Demandeur   -->  Demandeur   :  Accepte offre d'attestation d'identité ANIG de la personne representée et enregistre dans portefeuille
+end
 
 @enduml
 
