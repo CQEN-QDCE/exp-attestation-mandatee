@@ -128,19 +128,11 @@ Quelques médias d\'image standards ont été crées et déposées dans le répe
 # 4.0 Démarche
 
 <p align="center">
-  <img src="images/FluxGardEtape1.png" label="Émission d\'une attestation dont le sujet n'est pas le détenteur" />
+  <img src="images/Sequence.png" label="Séquence" />
 
   <br>
-  <b>Diagramme de séquence - Émission d\'attestation</b>
+  <b>Diagramme de séquence - Démarche</b>
 </p>
-
-<p align="center">
-  <img src="images/FluxGardEtape2.png" label="Émission d\'une attestation dont le sujet n'est pas le détenteur" />
-
-  <br>
-  <b>Diagramme de séquence - Vérification d\'attestation</b>
-</p>
---- Image de la démarche. En attente de Phil. ---
 
 ## 5.0 Le contenu des Attestations
 
