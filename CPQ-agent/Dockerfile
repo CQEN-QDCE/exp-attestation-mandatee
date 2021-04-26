@@ -1,1 +1,1 @@
-FROM bcgovimages/aries-cloudagent:py36-1.15-0_0.5.6
+FROM bcgovimages/aries-cloudagent:py36-1.16-0_0.6.0
