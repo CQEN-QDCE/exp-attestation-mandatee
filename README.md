@@ -101,7 +101,7 @@ régler les contraintes et particularités d\'un cas d\'affaires concret.
 * [VSCode](https://code.visualstudio.com)
 * [Debugger for Chrome](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome)
 
-### Déploiment
+### Déploiement
 Voir les instructions de [déploiment sur OpenShift](openshift/templates/README.md).
 
 
