@@ -91,7 +91,7 @@ régler les contraintes et particularités d\'un cas d\'affaires concret.
 ### Prérequis
 
 * [npm](https://www.npmjs.com)
-* [Docker](https://www.docker.com)
+* [docker](https://www.docker.com)
 * [von-network](https://github.com/bcgov/von-network)
 * [esatus](https://apps.apple.com/ca/app/esatus-wallet/id1496769057), [trinsic](https://apps.apple.com/ca/app/trinsic-wallet/id1475160728)
 * [ngrok](https://ngrok.com/)
