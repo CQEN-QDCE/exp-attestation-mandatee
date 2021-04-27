@@ -28,7 +28,12 @@ Si vous souhaitez changer le nom des organismes utilisés dans la démo, vous po
 
 Pour que l\'agent de communication puisse émettre des attestations, il est nécessaire de créer un DID public sur votre chaîne de bloc ou réutiliser celui de la démo '0000000000000000CurateurPublicQc'. Si vous avez installé un [VON-Network](https://github.com/bcgov/von-network) de la Province de la Colombie Britannique et que vous avez configurer l\'explorateur de bloc, vous pouvez utiliser son interface graphique pour créer un DID public. Si vous utilisez une autre chaîne de bloc que la votre, vous devrez utiliser les outils fournis pour le faire.
 
-![Explorateur de bloc](../../images/NewDID.png)
+<p align="center">
+  <img src="../../images/NewDID.png" label="Explorateur de bloc" />
+
+  <br>
+  <b>Création d'un DID</b>
+</p>
 
 ---
 

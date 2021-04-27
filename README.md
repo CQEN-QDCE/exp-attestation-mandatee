@@ -85,8 +85,25 @@ régler les contraintes et particularités d\'un cas d\'affaires concret.
 
 ## 3.0 Environnement d\'expérimentation
 
-L\'environnement d\'expérimentation peut être créé et reproduit en suivant la
-documentation se retrouvant sur ce lien [procédure d\'installation](openshift/templates/README.md). Elle permet l/'installation et l/'exécution de l\'expérimentation.
+### Construit avec
+* [React](https://fr.reactjs.org)
+
+### Prérequis
+
+* [npm](https://www.npmjs.com)
+* [Docker](https://www.docker.com)
+* [von-network](https://github.com/bcgov/von-network)
+* [esatus](https://apps.apple.com/ca/app/esatus-wallet/id1496769057), [trinsic](https://apps.apple.com/ca/app/trinsic-wallet/id1475160728)
+* [ngrok](https://ngrok.com/)
+
+### Facultatifs
+
+* [VSCode](https://code.visualstudio.com)
+* [Debugger for Chrome](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome)
+
+### Déploiment
+Voir les instructions de [déploiment sur OpenShift](openshift/templates/README.md).
+
 
 ### 3.1 Conditions initiales et prémisses
 
