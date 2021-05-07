@@ -3,7 +3,7 @@
 
 # Émettre une attestation d\'identité dont le détenteur n'est pas le sujet, par un organisme qui se base sur l\'émission d\'une attestation de mandat d\'un autre organisme
 
-Voici les travaux réalisés dans le cadre d\'une expérimentation basée sur le concept de l\'identité numérique. Le sujet: l\'émission d\'une attestation par mandat de curatelle émis par le Curateur Publique du Québec dans le but d\'explorer les concepts techniques de la relation vérifiable et évaluer des modèles permettant de soutenir la relation mandataire-mandant pour l\'attestation d\'identité gouvernementale.
+Voici les travaux réalisés dans le cadre d\'une expérimentation basée sur le concept de l\'identité numérique. Le sujet: l\'émission d\'une attestation d\'identité au représentant d\'un individu (sujet) par un organisme émetteur qui ne connaît pas la relation entre ces individus.  
 
 ## Table des matières
 
@@ -32,14 +32,15 @@ Voici les travaux réalisés dans le cadre d\'une expérimentation basée sur le
 
 ## 1.0 Objectifs
 
-- Explorer les concepts techniques de la relation vérifiable.
+- Explorer les concepts techniques permettant de soutenir la relation détenteur-sujet d\'une attestation.
 
-- Évaluer des modèles permettant de soutenir la relation
-  mandataire-mandant pour l\'attestation d\'identité gouvernementale.
+- Évaluer des modèles permettant de soutenir la relation représentant/individu représenté (ou détenteur/sujet)
+ pour l\'attestation d\'identité gouvernementale.
 
 ## 2.0 Contexte
 
-Le contrôle indirect de l\'identité est complexe. Un cas d\'utilisation
+Le contrôle indirect de l\'identité, soit l'émission d'une attestation
+d'un sujet à son représentant, est complexe. Un cas d\'utilisation
 minimal a été élaboré afin de permettre la mise en place de toutes les
 composantes nécessaires pour expérimenter le concept sans toutefois
 régler les contraintes et particularités d\'un cas d\'affaires concret.
@@ -49,7 +50,8 @@ régler les contraintes et particularités d\'un cas d\'affaires concret.
 > au bien-être et aux affaires de Solange. Luc fait donc une demande
 > auprès du tribunal afin d\'être nommé officiellement curateur de
 > Solange. Une fois le mandat homologué, Luc fait une demande auprès du
-> Registre d\'identité Québec (ou l\'organisme responsable de) pour obtenir l\'attestation d\'identité de sa mère afin de l\'aider à
+> d\'identité Québec (ou l\'organisme responsable de) pour 
+> obtenir l\'attestation d\'identité de sa mère afin de l\'aider à
 > obtenir les différents services au nom de cette dernière._
 
 <p align="center">
@@ -118,8 +120,7 @@ Voir les instructions de [déploiment sur OpenShift](openshift/templates/README.
 - Un émetteur et consommateur d\'attestations de mandat représentant le
   Tribunal est en place;
 
-- Luc n'a pas besoin de faire une vérification d\'identité pour obtenir
-  une attestation certifiant son identité;
+- Luc possède déjà son attestation numérique d\'identité au sein d'un portefeuille numérique; 
 
 - La documentation permettant d\'identifier Solange et les preuves
   permettant d\'établir la validité du mandat n'a pas besoin d\'être
@@ -128,11 +129,6 @@ Voir les instructions de [déploiment sur OpenShift](openshift/templates/README.
 - Les notifications et publications entre les intervenants ne sont pas
   de la portée de l\'expérimentation. On assume qu'elles sont
   exécutées de manière appropriée lorsque mentionnées;
-
-- Quelques médias d\'image standards ont été crées et déposées dans le
-  répertoire [d\'Avatars](./images/Avatar). Ces images peuvent être
-  utilisées dans les formulaires d\'entrée de données de la PES d\'émission
-  d\'attestation.
 
 <p align="center">
   <img src="images/EnvironnementTest.png" label="Environnement de test" />
@@ -209,7 +205,7 @@ Par exemple, l\'attestation d\'identité de luc pourrait être composée des val
 
 <b>Tableau 1 - Données de l\'attestation d\'identité de Luc</b>
 
-Autre exemple, l\'attestation d\'identité de la mère de luc, Solange pourrait être composée des valeurs suivantes:
+Autre exemple, l\'attestation d\'identité de la mère de luc, Solange, pourrait être composée des valeurs suivantes:
 
 | Nom de l'attribut                | Valeurs                                                                                                                                    |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -238,7 +234,7 @@ Voici le 2e type de schéma de données utilisé cette fois-ci pour le mandat :
 
 ```json
 {
-  "schema_name": "Mandat de Curatelle",
+  "schema_name": "Mandat de curatelle",
   "schema_version": "1.0",
   "attributes": [
     "@context",
@@ -338,7 +334,7 @@ En exemple, l\'attestation du mandat délivré à luc (détenteur) pour sa mère
 
 ## 6.0 Résultats attendus
 
-Deux schemas d\'attestation se retrouvent dans le répertoire de schemas. Ils doivent permettre:
+Deux schémas d\'attestation se retrouvent dans le répertoire de schémas. Ils doivent permettre:
 
 a) Attestation d\'identité
 
@@ -346,16 +342,16 @@ a) Attestation d\'identité
 
 b) Attestation de mandat
 
-- d\'identifier la personne responsable dans le mandat de curatelle
+- d\'identifier la personne responsable dans le mandat (représentant/détenteur)
 
-- d\'identifier la personne dépendante dans le mandat de curatelle
+- d\'identifier la personne dépendante dans le mandat (individu représenté/sujet)
 
 - d\'établir le lien entre la personne responsable et la personne
   dépendante selon les termes consignés dans le mandat
 
 - d\'identifier implicitement la personne responsable comme la
   détentrice de l\'attestation d\'identité de la personne dépendante
-  émise par Registre Québec.
+  émise par le Registre d'identité Québec.
 
 ## 7.0 Analyse
 
