@@ -355,14 +355,24 @@ b) Attestation de mandat
 
 ## 7.0 Analyse
 
-Dans un modèle de contrôle indirect de l\'identité, c\'est la
-relation _détenteur -- sujet_ basé sur une autre relation _mandataire -- mandant_
-qui permet ultimement à un individu de « posséder » une attestation traitant d\'un autre individu.
+Dans cette expérimentation, la représentation s’effectuait dans un contexte où la personne représentée n’était plus en mesure d’exercer le contrôle de son identité : c’est pour cette raison qu’une personne tierce a été nommée afin de veiller au bien-être du représenté. Il existe d’autres cas de figures où une attestation de représentation peut être émise à un individu sans pour autant que la personne représentée ne soit plus en mesure d’exercer le contrôle de son identité. On peut penser au cas où un avocat représente un client lors d’une transaction commerciale et où les termes de son mandat sont consignés par une attestation.
 
-TODO
+La présente expérimentation a été inspirée par le Registre d’entreprises instauré par la Colombie-Britannique. Dans cette solution, le Registre d’entreprises émet deux attestations au propriétaire de l’organisation : une qui représente l’organisation elle-même et une qui représente la relation d’autorité entre le propriétaire et l’organisation. Une fois en possession de ces attestations, le propriétaire peut déléguer ses pouvoirs à d’autres personnes (employés, associés, ...) en informant le Registre d’entreprises. Ce dernier émettra alors une attestation qui représente la relation entre les individus nommés et l’organisation.
+
+Il faut noter que dans l’expérimentation et dans l’exemple du Registre d’entreprises de la Colombie-Britannique, la relation entre le représentant et le représenté n’est pas connue a priori de l’organisme émetteur. Cela a pour implication que le demandeur doit être en mesure de démontrer cette relation et que l’organisme émetteur soit en mesure de la valider. Dans un monde idéal, tout pourrait se faire à l’aide d’attestations numériques. Dans la réalité, il est fort possible que des moyens plus traditionnels soient utilisés. En effet, dans l’expérimentation, il aurait été difficile de présenter la décision prise par la famille de Solange sous forme d’attestation numérique : cela impliquerait que la famille est un émetteur de confiance dans l’écosystème et que l’attestation a une valeur légale.
 
 ## 8.0 Conclusion
 
-TODO
+L'expérimentation a permis d'explorer les concepts techniques du contrôle indirect de l'identité, soit l'émission d'une attestation d'un sujet à son représentant. Elle a aussi permis d’évaluer les modèles permettant de soutenir la relation représentant - individu représenté pour une attestation numérique d'identité gouvernementale.
+
+L’attestation vérifiable prouvant le lien entre le représentant et l'individu représenté est émise par une tierce partie qui a les moyens de valider ce dernier et l’autorité de le certifier. Il revient à cette tierce partie d'appliquer ses diverses règles d'affaires aux données qui lui sont soumises avant d’homologuer le mandat.
+
+L’attestation homologuant le mandat devient un moyen pour le représentant d’exécuter son rôle. Comme dans le monde non numérique, le représentant devra prouver qu’il est bien la personne qu’il prétend être et qu’il est mandaté pour agir au nom de la personne représentée. Il revient à l’entité qui doit livrer la prestation de services de valider l’information afin de s’assurer de la conformité du mandat.
+
+La notion de mandat ouvre la porte au concept de représentation dans lequel il est possible que le représentant soit appelé à conserver les attestations de la personne représentée dans son portefeuille numérique. Il faut donc que les portefeuilles offrent les fonctionnalités facilitant la gestion des attestations par le détenteur telles des mécanismes de filtres et de tris. Les versions de portefeuilles utilisées lors des expérimentations ne le permettaient pas mais les avancements dans ce champ de développement laissent croire que ce genre de fonctionnalités pourrait apparaitre d’ici peu.
+
+Finalement, nous constatons que la notion de mandat est relativement simple à porter dans le monde de l’identité numérique dû au fait qu’un mandat est généralement normé avec des règles d’affaires bien précises. Le monde numérique devient un moyen de faciliter l’application de ces dernières.
+
+
 ## 9.0 Licence
 Distribué sous Licence Libre du Québec – Réciprocité (LiLiQ-R). Voir [LICENCE](LICENSE) pour plus d'informations.
