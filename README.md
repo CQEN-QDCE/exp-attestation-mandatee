@@ -1,14 +1,16 @@
 <!-- ENTETE -->
 [![img](https://img.shields.io/badge/Cycle%20de%20Vie-Phase%20d%C3%A9couverte-339999)](https://www.quebec.ca/gouv/politiques-orientations/vitrine-numeriqc/accompagnement-des-organismes-publics/demarche-conception-services-numeriques)
 [![License](https://img.shields.io/badge/Licence-LiLiQ--R-blue)](LICENSE)
+
 ---
+
 <div>
     <a target="_blank" href="https://www.quebec.ca/gouvernement/ministere/cybersecurite-numerique">
       <img src="https://github.com/CQEN-QDCE/.github/blob/main/images/mcn.png" alt="Logo du Ministère de la cybersécurité et du numérique" />
     </a>
 </div>
-
 <!-- FIN ENTETE -->
+
 # Émettre une attestation d\'identité dont le détenteur n'est pas le sujet, par un organisme qui se base sur l\'émission d\'une attestation de mandat d\'un autre organisme
 
 Voici les travaux réalisés dans le cadre d\'une expérimentation basée sur le concept de l\'identité numérique. Le sujet: l\'émission d\'une attestation d\'identité au représentant d\'un individu (sujet) par un organisme émetteur qui ne connaît pas la relation entre ces individus.  
